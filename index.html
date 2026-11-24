@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Festa di Natale · Casale Schiavella</title>
+  <meta name="description" content="Sabato 19 dicembre, ore 18:30, al Casale Schiavella. Karaoke, DJ set, Babbo Natale segreto e qualche sorpresa.">
+  <meta name="theme-color" content="#f6efe2">
+  <meta property="og:title" content="Festa di Natale · Casale Schiavella">
+  <meta property="og:description" content="Sabato 19 dicembre, ore 18:30. Karaoke, DJ set, Babbo Natale segreto e qualche sorpresa.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..800,50;1,9..144,300..800,50&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="bar">
+    <a href="#top" class="bar__mark">✶ Casale Schiavella</a>
+    <nav class="bar__nav">
+      <a href="#serata">La serata</a>
+      <a href="#babbo">Babbo segreto</a>
+      <a href="#sorprese">Sorprese</a>
+      <a href="#dove">Dove</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <p class="eyebrow reveal">Sei invitato · Sabato 19 dicembre 2026</p>
+      <h1 class="hero__title reveal">
+        <span class="line">Festa</span>
+        <span class="line line--indent"><em>di</em> Natale</span>
+      </h1>
+
+      <div class="hero__badge" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <defs><path id="circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+          <text><textPath href="#circle">19 · 12 · ore 18:30 · Casale Schiavella · 19 · 12 · ore 18:30 · Casale Schiavella ·</textPath></text>
+        </svg>
+        <span class="hero__badge-star">✶</span>
+      </div>
+
+      <div class="hero__grid reveal">
+        <dl class="facts">
+          <div><dt>Quando</dt><dd>Sab 19.12</dd></div>
+          <div><dt>Ore</dt><dd>18:30</dd></div>
+          <div><dt>Dove</dt><dd>Casale Schiavella</dd></div>
+        </dl>
+
+        <div class="countdown" id="countdown" aria-live="polite">
+          <p class="countdown__label">Mancano</p>
+          <div class="countdown__row">
+            <div><span data-cd="d">--</span><small>giorni</small></div>
+            <div><span data-cd="h">--</span><small>ore</small></div>
+            <div><span data-cd="m">--</span><small>min</small></div>
+            <div><span data-cd="s">--</span><small>sec</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__cta reveal">
+        <a class="btn btn--solid" id="ics" href="#" download="festa-di-natale.ics">Aggiungi al calendario</a>
+        <a class="btn" href="#dove">Come arrivare ↓</a>
+      </div>
+    </section>
+
+    <!-- TICKER -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track" id="ticker"></div>
+    </div>
+
+    <!-- LA SERATA -->
+    <section class="section" id="serata">
+      <header class="section__head">
+        <span class="section__num">01</span>
+        <h2>La serata</h2>
+        <p class="section__lede">Si arriva, si mangia, si canta male, si balla meglio.</p>
+      </header>
+
+      <ol class="program">
+        <li class="program__item reveal">
+          <span class="program__time">18:30</span>
+          <div>
+            <h3>Arrivo</h3>
+            <p>Ci si ritrova al Casale Schiavella. Porta il tuo regalo per il Babbo Natale segreto.</p>
+          </div>
+        </li>
+        <li class="program__item reveal">
+          <span class="program__time">Cena</span>
+          <div>
+            <h3>A tavola</h3>
+            <p>All'inizio si sorteggia a chi va il tuo regalo. Alla fine si scopre chi ti ha pensato.</p>
+          </div>
+        </li>
+        <li class="program__item reveal">
+          <span class="program__time">Dopo</span>
+          <div>
+            <h3>Karaoke</h3>
+            <p>Microfono aperto. Non serve essere intonati, serve essere convinti.</p>
+          </div>
+        </li>
+        <li class="program__item reveal">
+          <span class="program__time">Tardi</span>
+          <div>
+            <h3>DJ set</h3>
+            <p>Quando le voci sono finite, parte la musica.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- BABBO NATALE SEGRETO -->
+    <section class="secret" id="babbo">
+      <div class="secret__inner">
+        <span class="section__num section__num--light">02</span>
+        <p class="eyebrow eyebrow--light">Babbo Natale segreto, a modo nostro</p>
+        <blockquote class="secret__quote reveal">
+          “Ho un pensiero per te,<br><em>anche se non so chi sei.</em>”
+        </blockquote>
+
+        <div class="secret__steps">
+          <div class="step reveal">
+            <span class="step__n">i.</span>
+            <h3>Il regalo ce l'hai già</h3>
+            <p>Lo hai scelto senza sapere per chi sarà. È proprio questo il bello.</p>
+          </div>
+          <div class="step reveal">
+            <span class="step__n">ii.</span>
+            <h3>Inizio cena: sorteggio</h3>
+            <p>Peschi un nome. Da quel momento sai a chi andrà il tuo pensiero. Acqua in bocca.</p>
+          </div>
+          <div class="step reveal">
+            <span class="step__n">iii.</span>
+            <h3>Fine cena: si svela</h3>
+            <p>Si consegnano i regali e ognuno scopre chi lo ha pensato.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SORPRESE -->
+    <section class="section" id="sorprese">
+      <header class="section__head">
+        <span class="section__num">03</span>
+        <h2>Le sorprese</h2>
+        <p class="section__lede">Non è tutto qui. Il resto è ancora coperto: si scopre un pezzo alla volta.</p>
+      </header>
+
+      <ol class="files" id="files"></ol>
+    </section>
+
+    <!-- DOVE -->
+    <section class="section section--where" id="dove">
+      <header class="section__head">
+        <span class="section__num">04</span>
+        <h2>Dove</h2>
+      </header>
+
+      <div class="where">
+        <div class="where__addr reveal">
+          <p class="where__name">Casale Schiavella</p>
+          <p class="where__street">Via Colle Mufiano, 29</p>
+          <p class="where__note">Siamo in campagna. Fidati del navigatore fino all'ultimo.</p>
+          <a class="btn btn--solid" id="maps" href="#" target="_blank" rel="noopener">Apri in Google Maps ↗</a>
+        </div>
+
+        <div class="where__bring reveal">
+          <h3>Da portare</h3>
+          <ul>
+            <li>Il regalo per il Babbo Natale segreto</li>
+            <li>Una giacca pesante: la sera in campagna fa freddo</li>
+            <li>La voce per il karaoke</li>
+            <li>Scarpe con cui si può ballare</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <canvas id="snow" aria-hidden="true"></canvas>
+    <p class="foot__big">Ci vediamo <em>il 19.</em></p>
+    <p class="foot__small">Sabato 19 dicembre · ore 18:30 · Casale Schiavella · Via Colle Mufiano, 29</p>
+  </footer>
+
+  <script src="assets/surprises.js"></script>
+  <script src="assets/script.js"></script>
+</body>
+</html>
