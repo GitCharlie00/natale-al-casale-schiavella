@@ -8,7 +8,7 @@ const PARTY = {
   end: new Date("2026-12-20T02:00:00+01:00"),
   place: "Casale Schiavella",
   address: "Via Colle Mufiano, 29",
-  mapsQuery: "Casale Schiavella, Via Colle Mufiano 29",
+  mapsUrl: "https://maps.app.goo.gl/sTACmPTSg16Ww5D77",
 };
 
 document.documentElement.classList.add("js");
@@ -82,7 +82,7 @@ const icsDate = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "
     "END:VCALENDAR",
   ].join("\r\n");
   $("#ics").href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
-  $("#maps").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(PARTY.mapsQuery);
+  $("#maps").href = PARTY.mapsUrl;
 })();
 
 /* ================================================================
