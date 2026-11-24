@@ -158,10 +158,13 @@ function giftSVG(i) {
 const OPENED_KEY = "festa-pacchi-aperti";
 const opened = new Set(JSON.parse(store.get(OPENED_KEY) || "[]"));
 const saveOpened = () => store.set(OPENED_KEY, JSON.stringify([...opened]));
+let lastGift = null; // in vista admin: il pacco da richiudere quando si chiude la lettera
 
 function renderGifts() {
   const wrap = $("#gifts");
   const now = Date.now();
+  // in vista admin i pacchi si richiudono sempre: così l'animazione si rivede quante volte vuoi
+  const replay = !!adminData;
   wrap.innerHTML = "";
 
   items.forEach((s, i) => {
@@ -171,7 +174,7 @@ function renderGifts() {
     const until = s.at.getTime() - now;
     const days = Math.ceil(until / DAY);
     const when = until <= 0 ? "a momenti" : days <= 1 ? "domani" : `tra ${days} giorni`;
-    const isOpen = !!content && opened.has(key);
+    const isOpen = !replay && !!content && opened.has(key);
 
     const li = document.createElement("li");
     li.className = "gift" + (content ? " gift--ready" : " gift--locked") + (isOpen ? " is-open" : "");
@@ -205,8 +208,12 @@ function renderGifts() {
         return;
       }
       const already = li.classList.contains("is-open");
-      opened.add(key);
-      saveOpened();
+      if (replay) {
+        lastGift = { li, caption, text: caption.textContent };
+      } else {
+        opened.add(key);
+        saveOpened();
+      }
       li.classList.add("is-open");
       caption.textContent = content.title;
       setTimeout(() => openLetter(i, content, isPublic), already ? 0 : 650);
@@ -239,6 +246,15 @@ function openLetter(i, c, isPublic) {
   const close = () => (dlg.close ? dlg.close() : dlg.removeAttribute("open"));
   $(".letter__close", dlg).addEventListener("click", close);
   dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
+  dlg.addEventListener("close", () => {
+    if (!lastGift) return;
+    const { li, caption, text } = lastGift;
+    lastGift = null;
+    setTimeout(() => {
+      li.classList.remove("is-open");
+      caption.textContent = text;
+    }, 150);
+  });
 })();
 
 /* ---------- ticker ---------- */
