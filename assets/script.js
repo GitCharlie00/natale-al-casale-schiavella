@@ -132,7 +132,7 @@ function renderFiles() {
       const fresh = isPublic && now - s.at.getTime() < 2 * DAY;
       const tag = !isPublic
         ? `<span class="file__tag file__tag--admin">Anteprima admin</span>`
-        : fresh ? `<span class="file__tag">Appena scoperta</span>` : "";
+        : fresh ? `<span class="file__tag">Appena scartata</span>` : "";
       middle = `
         <div class="file__main">
           <p class="file__label">Sorpresa n° ${i + 1}${tag}</p>
@@ -140,17 +140,17 @@ function renderFiles() {
           <div class="file__body"></div>
         </div>`;
       status = isPublic
-        ? `<div class="file__status"><b>Scoperta</b>il ${fmtLong.format(s.at)}</div>`
+        ? `<div class="file__status"><b>Scartata</b>il ${fmtLong.format(s.at)}</div>`
         : `<div class="file__status"><b>${when}</b>pubblico il ${fmtLong.format(s.at)}</div>`;
     } else {
       const bars = BARS[i % BARS.length];
       middle = `
-        <div class="file__main" aria-label="Sorpresa ancora coperta">
-          <p class="file__label">Sorpresa n° ${i + 1} · coperta</p>
+        <div class="file__main" aria-label="Sorpresa ancora incartata">
+          <p class="file__label">Sorpresa n° ${i + 1} · ancora incartata</p>
           <span class="redact redact--title">${bars.t.map((w) => `<i style="width:${w}%"></i>`).join("")}</span>
           <span class="redact redact--body">${bars.b.map((w) => `<i style="width:${w}%"></i>`).join("")}</span>
         </div>`;
-      status = `<div class="file__status"><b>${when}</b>si scopre il ${fmtLong.format(s.at)}</div>`;
+      status = `<div class="file__status"><b>${when}</b>si scarta il ${fmtLong.format(s.at)}</div>`;
     }
 
     li.innerHTML = date + middle + status;
@@ -315,4 +315,66 @@ document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     visible = e.isIntersecting;
     if (visible && !was) frame();
   }).observe(host);
+})();
+
+/* ---------- lucine nel hero ---------- */
+(function lights() {
+  const host = $("#lights");
+  const NS = "http://www.w3.org/2000/svg";
+  const COLORS = ["#c9372b", "#e8b44f", "#1f7a4d", "#e86a3a", "#f7f0e3"];
+
+  function draw() {
+    const w = host.clientWidth;
+    const span = w < 600 ? 3 : 5; // numero di festoni
+    const seg = w / span;
+    const sag = w < 600 ? 26 : 40;
+    let d = "";
+    const bulbs = [];
+    for (let k = 0; k < span; k++) {
+      const x0 = k * seg, x1 = x0 + seg;
+      d += `M${x0},4 Q${x0 + seg / 2},${4 + sag * 2} ${x1},4 `;
+      const n = Math.max(4, Math.round(seg / 46));
+      for (let j = 1; j < n; j++) {
+        const t = j / n;
+        const x = x0 + seg * t;
+        const y = 4 + 2 * t * (1 - t) * sag * 2; // curva quadratica
+        bulbs.push([x, y]);
+      }
+    }
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", `0 0 ${w} 90`);
+    svg.innerHTML =
+      `<path class="wire" d="${d}"/>` +
+      bulbs
+        .map(([x, y], i) => {
+          const c = COLORS[i % COLORS.length];
+          const delay = ((i * 0.37) % 2.6).toFixed(2);
+          return `<g class="bulb" style="color:${c};animation-delay:-${delay}s">
+            <rect x="${x - 3}" y="${y - 1}" width="6" height="6" rx="1" fill="#3c4a3f"/>
+            <ellipse cx="${x}" cy="${y + 12}" rx="5.5" ry="8" fill="${c}"/>
+          </g>`;
+        })
+        .join("");
+    host.replaceChildren(svg);
+  }
+  draw();
+  let t;
+  addEventListener("resize", () => { clearTimeout(t); t = setTimeout(draw, 150); });
+})();
+
+/* ---------- bosco innevato nel footer ---------- */
+(function forest() {
+  const svg = $("#forest");
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+  let trees = "";
+  for (let x = -20; x < 1220; x += 26 + rnd() * 30) {
+    const h = 60 + rnd() * 90;
+    const wd = h * (0.42 + rnd() * 0.12);
+    const base = 160;
+    const shade = rnd() > 0.5 ? "#143a26" : "#0f2f1e";
+    trees += `<path d="M${x},${base} L${x + wd / 2},${base - h} L${x + wd},${base}Z" fill="${shade}"/>`;
+    trees += `<path d="M${x + wd / 2},${base - h} L${x + wd / 2 - wd * 0.14},${base - h * 0.7} L${x + wd / 2 + wd * 0.14},${base - h * 0.7}Z" fill="#f7f0e3" opacity=".9"/>`;
+  }
+  svg.innerHTML = trees + `<path d="M0,160 L0,148 Q300,132 600,146 T1200,140 L1200,160Z" fill="#f7f0e3"/>`;
 })();
