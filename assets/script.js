@@ -95,80 +95,151 @@ const SRC = window.SURPRISES || { items: [], vault: null };
 const items = SRC.items.map((s) => ({ ...s, at: new Date(s.unlock + "T00:00:00+01:00") }));
 let adminData = null; // array decifrato, se admin
 
-// lunghezze delle barre di censura (fisse, non dipendono dal testo vero)
-const BARS = [
-  { t: [58], b: [96, 88, 41] },
-  { t: [72, 30], b: [92, 64] },
-  { t: [44], b: [97, 90, 83, 36] },
-  { t: [66, 48], b: [94, 57] },
+/* ---------- i pacchi sotto l'albero ---------- */
+// ogni pacco ha la sua carta, il suo nastro e la sua altezza
+const WRAPS = [
+  { paper: "#c9372b", ribbon: "#e8b44f", knot: "#f0c463", pattern: "dots", ink: "#f7f0e3", size: 0.92 },
+  { paper: "#1f5a3a", ribbon: "#c9372b", knot: "#e0503c", pattern: "stripes", ink: "#e8b44f", size: 0.8 },
+  { paper: "#f1e3c6", ribbon: "#1f5a3a", knot: "#2c6e49", pattern: "stars", ink: "#c9372b", size: 1 },
+  { paper: "#d9a441", ribbon: "#c9372b", knot: "#e0503c", pattern: "check", ink: "#1f5a3a", size: 0.86 },
 ];
 
-function renderFiles() {
-  const list = $("#files");
+function patternDef(id, w) {
+  switch (w.pattern) {
+    case "dots":
+      return `<pattern id="${id}" width="18" height="18" patternUnits="userSpaceOnUse">
+        <rect width="18" height="18" fill="${w.paper}"/>
+        <circle cx="4.5" cy="4.5" r="2.4" fill="${w.ink}"/><circle cx="13.5" cy="13.5" r="2.4" fill="${w.ink}"/></pattern>`;
+    case "stripes":
+      return `<pattern id="${id}" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="16" height="16" fill="${w.paper}"/><rect width="5" height="16" fill="${w.ink}"/></pattern>`;
+    case "stars":
+      return `<pattern id="${id}" width="34" height="34" patternUnits="userSpaceOnUse">
+        <rect width="34" height="34" fill="${w.paper}"/>
+        <path d="M9 3l1.8 4.6 4.9.3-3.8 3.1 1.3 4.8L9 13.1 4.8 15.8l1.3-4.8L2.3 7.9l4.9-.3z" fill="${w.ink}"/>
+        <circle cx="26" cy="25" r="1.6" fill="${w.ink}"/></pattern>`;
+    default:
+      return `<pattern id="${id}" width="20" height="20" patternUnits="userSpaceOnUse">
+        <rect width="20" height="20" fill="${w.paper}"/>
+        <rect width="10" height="20" fill="${w.ink}" opacity=".28"/><rect width="20" height="10" fill="${w.ink}" opacity=".28"/></pattern>`;
+  }
+}
+
+function giftSVG(i) {
+  const w = WRAPS[i % WRAPS.length];
+  const id = `wrap${i}`;
+  return `
+  <svg class="gift__svg" viewBox="0 0 200 230" aria-hidden="true">
+    <defs>${patternDef(id, w)}</defs>
+    <ellipse cx="100" cy="222" rx="92" ry="7" fill="rgba(21,51,31,.14)"/>
+    <g class="gift__inside">
+      <rect class="gift__card" x="58" y="70" width="84" height="50" rx="2" fill="#fbf6ec" stroke="#d9cbb0"/>
+      <path class="gift__card" d="M58 70 L100 98 L142 70" fill="none" stroke="#d9cbb0"/>
+    </g>
+    <g class="gift__body">
+      <rect x="22" y="96" width="156" height="124" rx="3" fill="url(#${id})"/>
+      <rect x="22" y="96" width="156" height="12" fill="rgba(0,0,0,.12)"/>
+      <rect x="88" y="96" width="24" height="124" fill="${w.ribbon}"/>
+      <rect x="22" y="150" width="156" height="20" fill="${w.ribbon}"/>
+    </g>
+    <g class="gift__lid">
+      <rect x="14" y="70" width="172" height="32" rx="3" fill="url(#${id})"/>
+      <rect x="14" y="94" width="172" height="8" fill="rgba(0,0,0,.1)"/>
+      <rect x="88" y="70" width="24" height="32" fill="${w.ribbon}"/>
+      <path d="M100 70 C82 38, 50 34, 54 56 C57 72, 84 72, 100 70Z" fill="${w.ribbon}"/>
+      <path d="M100 70 C118 38, 150 34, 146 56 C143 72, 116 72, 100 70Z" fill="${w.ribbon}"/>
+      <path d="M100 70 C86 52, 66 50, 66 58 C67 66, 86 70, 100 70Z" fill="rgba(0,0,0,.14)"/>
+      <path d="M100 70 C114 52, 134 50, 134 58 C133 66, 114 70, 100 70Z" fill="rgba(0,0,0,.14)"/>
+      <rect x="91" y="60" width="18" height="16" rx="5" fill="${w.knot}"/>
+    </g>
+  </svg>`;
+}
+
+const OPENED_KEY = "festa-pacchi-aperti";
+const opened = new Set(JSON.parse(store.get(OPENED_KEY) || "[]"));
+const saveOpened = () => store.set(OPENED_KEY, JSON.stringify([...opened]));
+
+function renderGifts() {
+  const wrap = $("#gifts");
   const now = Date.now();
-  list.innerHTML = "";
+  wrap.innerHTML = "";
 
   items.forEach((s, i) => {
-    const pub = s.data || null;
-    const adm = adminData ? adminData[i] : null;
-    const content = pub || adm;
-    const isPublic = !!pub;
-    const li = document.createElement("li");
-    li.className = "file " + (content ? "file--open" : "file--locked");
-
+    const isPublic = !!s.data;
+    const content = s.data || (adminData ? adminData[i] : null);
+    const key = s.unlock + (isPublic ? "" : "-admin");
     const until = s.at.getTime() - now;
     const days = Math.ceil(until / DAY);
-    const when =
-      until <= 0 ? "a momenti" : days <= 1 ? "domani" : `tra ${days} giorni`;
+    const when = until <= 0 ? "a momenti" : days <= 1 ? "domani" : `tra ${days} giorni`;
+    const isOpen = !!content && opened.has(key);
 
-    const date = `
-      <div class="file__date">
-        <span class="file__day">${fmtDay.format(s.at)}</span>
-        <span class="file__month">${fmtMonth.format(s.at)}</span>
-      </div>`;
+    const li = document.createElement("li");
+    li.className = "gift" + (content ? " gift--ready" : " gift--locked") + (isOpen ? " is-open" : "");
+    li.style.setProperty("--size", WRAPS[i % WRAPS.length].size);
 
-    let middle, status;
-    if (content) {
-      const fresh = isPublic && now - s.at.getTime() < 2 * DAY;
-      const tag = !isPublic
-        ? `<span class="file__tag file__tag--admin">Anteprima admin</span>`
-        : fresh ? `<span class="file__tag">Appena scartata</span>` : "";
-      middle = `
-        <div class="file__main">
-          <p class="file__label">Sorpresa n° ${i + 1}${tag}</p>
-          <h3 class="file__title"></h3>
-          <div class="file__body"></div>
-        </div>`;
-      status = isPublic
-        ? `<div class="file__status"><b>Scartata</b>il ${fmtLong.format(s.at)}</div>`
-        : `<div class="file__status"><b>${when}</b>pubblico il ${fmtLong.format(s.at)}</div>`;
-    } else {
-      const bars = BARS[i % BARS.length];
-      middle = `
-        <div class="file__main" aria-label="Sorpresa ancora incartata">
-          <p class="file__label">Sorpresa n° ${i + 1} · ancora incartata</p>
-          <span class="redact redact--title">${bars.t.map((w) => `<i style="width:${w}%"></i>`).join("")}</span>
-          <span class="redact redact--body">${bars.b.map((w) => `<i style="width:${w}%"></i>`).join("")}</span>
-        </div>`;
-      status = `<div class="file__status"><b>${when}</b>si scarta il ${fmtLong.format(s.at)}</div>`;
-    }
+    const tagLine = content ? (isPublic ? "Aprimi" : "Anteprima") : when;
+    const label = content
+      ? `Apri la sorpresa numero ${i + 1}`
+      : `Sorpresa numero ${i + 1}, si apre il ${fmtLong.format(s.at)}`;
 
-    li.innerHTML = date + middle + status;
+    li.innerHTML = `
+      <button class="gift__btn" type="button" aria-label="${label}">
+        ${giftSVG(i)}
+        <span class="gift__tag" aria-hidden="true">
+          <span class="gift__tag-n">N° ${i + 1}</span>
+          <span class="gift__tag-d">${fmtDay.format(s.at)} ${fmtMonth.format(s.at).slice(0, 3)}</span>
+          <span class="gift__tag-w">${tagLine}</span>
+        </span>
+      </button>
+      <p class="gift__caption"></p>`;
 
-    if (content) {
-      $(".file__title", li).textContent = content.title;
-      const body = $(".file__body", li);
-      content.body.forEach((p) => {
-        const el = document.createElement("p");
-        el.textContent = p;
-        body.appendChild(el);
-      });
-    }
-    list.appendChild(li);
+    const caption = $(".gift__caption", li);
+    caption.textContent = isOpen ? content.title : content ? "Pronto da scartare" : "Ancora incartato";
+
+    $(".gift__btn", li).addEventListener("click", () => {
+      if (!content) {
+        li.classList.remove("is-shaking");
+        void li.offsetWidth;
+        li.classList.add("is-shaking");
+        caption.textContent = `Niente sbirciate: si apre il ${fmtLong.format(s.at)}`;
+        return;
+      }
+      const already = li.classList.contains("is-open");
+      opened.add(key);
+      saveOpened();
+      li.classList.add("is-open");
+      caption.textContent = content.title;
+      setTimeout(() => openLetter(i, content, isPublic), already ? 0 : 650);
+    });
+
+    wrap.appendChild(li);
   });
 
   renderTicker();
 }
+
+/* ---------- la lettera nel pacco ---------- */
+function openLetter(i, c, isPublic) {
+  const dlg = $("#letter");
+  $(".letter__meta", dlg).textContent =
+    `Sorpresa n° ${i + 1} · ${isPublic ? "scartata" : "si apre"} il ${fmtLong.format(items[i].at)}`;
+  $(".letter__title", dlg).textContent = c.title;
+  const body = $(".letter__body", dlg);
+  body.innerHTML = "";
+  c.body.forEach((p) => {
+    const el = document.createElement("p");
+    el.textContent = p;
+    body.appendChild(el);
+  });
+  if (typeof dlg.showModal === "function") dlg.showModal();
+  else dlg.setAttribute("open", "");
+}
+(function setupLetter() {
+  const dlg = $("#letter");
+  const close = () => (dlg.close ? dlg.close() : dlg.removeAttribute("open"));
+  $(".letter__close", dlg).addEventListener("click", close);
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
+})();
 
 /* ---------- ticker ---------- */
 function renderTicker() {
@@ -216,7 +287,7 @@ function adminPanel(state, msg = "") {
       adminData = null;
       box.remove();
       history.replaceState(null, "", location.pathname + location.hash);
-      renderFiles();
+      renderGifts();
     };
     return;
   }
@@ -234,7 +305,7 @@ function adminPanel(state, msg = "") {
       adminData = await openVault(pass);
       store.set(ADMIN_KEY, pass);
       adminPanel("on");
-      renderFiles();
+      renderGifts();
       $("#sorprese").scrollIntoView();
     } catch {
       adminPanel("off", "Password sbagliata.");
@@ -249,7 +320,7 @@ function adminPanel(state, msg = "") {
     try {
       adminData = await openVault(saved);
       adminPanel("on");
-      renderFiles();
+      renderGifts();
       return;
     } catch {
       store.del(ADMIN_KEY);
@@ -258,7 +329,7 @@ function adminPanel(state, msg = "") {
   if (wantsAdmin) adminPanel("off");
 })();
 
-renderFiles();
+renderGifts();
 
 /* ---------- comparsa allo scroll ---------- */
 const io = new IntersectionObserver(

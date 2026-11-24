@@ -188,10 +188,13 @@
       <header class="section__head">
         <span class="section__num">03</span>
         <h2>Le sorprese</h2>
-        <p class="section__lede">Non è tutto qui. Il resto è ancora incartato: si scarta un regalo alla volta.</p>
+        <p class="section__lede">Sotto l'albero ci sono quattro pacchi. Se ne apre uno alla volta: torna a controllare.</p>
       </header>
 
-      <ol class="files" id="files"></ol>
+      <div class="floor">
+        <ol class="gifts" id="gifts"></ol>
+      </div>
+      <p class="gifts__hint">Tocca un pacco: quelli pronti si aprono, gli altri si possono solo scuotere.</p>
     </section>
 
     <!-- DOVE -->
@@ -215,7 +218,7 @@
             <li>Il regalo per il Babbo Natale segreto</li>
             <li>Una giacca pesante: la sera in campagna fa freddo</li>
             <li>La voce per il karaoke</li>
-            <li>Scarpe con cui si può ballare</li>
+            <li>Voglia di giocare, ridere e fare tardi</li>
           </ul>
         </div>
       </div>
@@ -228,6 +231,17 @@
     <p class="foot__big">Ci vediamo <em>il 19.</em></p>
     <p class="foot__small">Sabato 19 dicembre · ore 18:30 · Casale Schiavella · Via Colle Mufiano, 29</p>
   </footer>
+
+  <dialog class="letter" id="letter" aria-labelledby="letter-title">
+    <div class="letter__paper">
+      <div class="letter__stamp" aria-hidden="true"><span>✶</span><small>19·12</small></div>
+      <p class="letter__meta"></p>
+      <h3 class="letter__title" id="letter-title"></h3>
+      <div class="letter__body"></div>
+      <p class="letter__sign">Ci vediamo il 19,<br><em>Casale Schiavella</em></p>
+      <button class="btn letter__close" type="button">Chiudi</button>
+    </div>
+  </dialog>
 
   <script src="assets/surprises.js"></script>
   <script src="assets/script.js"></script>
